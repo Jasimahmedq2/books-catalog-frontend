@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { useEditBookMutation } from "../redux/features/books/bookApi";
 
 interface BookFormData {
   title: string;
@@ -11,14 +15,26 @@ interface BookFormData {
 
 const EditPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { bookId } = useParams();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<BookFormData>();
+
+  const [editBook] = useEditBookMutation();
   const onSubmit: SubmitHandler<BookFormData> = (data) => {
-    console.log(data);
+    const editOptions = {
+      updatedData: {
+        title: data.title,
+        author: data.author,
+        publishedDate: data.publishedDate,
+        genre: data.genre,
+      },
+      bookId,
+    };
+    editBook(editOptions);
     reset();
   };
 

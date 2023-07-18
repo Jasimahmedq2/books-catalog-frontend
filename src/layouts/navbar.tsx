@@ -1,5 +1,11 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { logOut } from "../redux/features/user/authSlice";
 
 const navbar = () => {
+  const dispatch = useAppDispatch();
+  const { isLogin } = useAppSelector((state) => state.user);
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
@@ -59,7 +65,13 @@ const navbar = () => {
               <a>Settings</a>
             </li>
             <li>
-              <a>Logout</a>
+              {isLogin ? (
+                <Link to="/login" onClick={() => dispatch(logOut())}>
+                  Logout
+                </Link>
+              ) : (
+                <Link to="/login">login</Link>
+              )}
             </li>
           </ul>
         </div>

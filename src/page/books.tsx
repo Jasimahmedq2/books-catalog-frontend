@@ -1,65 +1,48 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useForm, SubmitHandler } from "react-hook-form";
 import BookCard from "../components/card";
-
-const allBooks = [
-  {
-    _id: "1",
-    image:
-      "https://img.freepik.com/free-vector/abstract-elegant-winter-book-cover_23-2148798745.jpg?w=2000",
-    author: "jasim ahmed",
-    genre: "fantasy",
-    publishedDate: "02-04-2014",
-    title: "the book title",
-  },
-  {
-    _id: "2",
-    image:
-      "https://img.freepik.com/free-vector/abstract-elegant-winter-book-cover_23-2148798745.jpg?w=2000",
-    author: "jasim ahmed",
-    genre: "fantasy",
-    publishedDate: "02-04-2014",
-    title: "the book title",
-  },
-  {
-    _id: "3",
-    image:
-      "https://img.freepik.com/free-vector/abstract-elegant-winter-book-cover_23-2148798745.jpg?w=2000",
-    author: "jasim ahmed",
-    genre: "fantasy",
-    publishedDate: "02-04-2014",
-    title: "the book title",
-  },
-  {
-    _id: "4",
-    image:
-      "https://img.freepik.com/free-vector/abstract-elegant-winter-book-cover_23-2148798745.jpg?w=2000",
-    author: "jasim ahmed",
-    genre: "fantasy",
-    publishedDate: "02-04-2014",
-    title: "the book title",
-  },
-];
+import { useGetPageBooksQuery } from "../redux/features/books/bookApi";
+import { IBook } from "../interfaces/books/bookInterface";
+import { useState } from "react";
 
 interface BookFormData {
   searchQuery: string;
   genreFilter: string;
-  publishedDate: string;
+  publishedYearFilter: string;
 }
 
 const Books = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const [queryParams, setQueryParams] = useState<BookFormData | null>({
+    searchQuery: "",
+    genreFilter: "",
+    publishedYearFilter: "",
+  });
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<BookFormData>();
-  const onSubmit: SubmitHandler<BookFormData> = (data) => {
-    console.log(data);
-    reset();
+
+  const { data: booksData, isLoading } = useGetPageBooksQuery({
+    params: queryParams,
+  });
+
+  if (isLoading) {
+    return <p>loading...</p>;
+  }
+
+  const onSubmit: SubmitHandler<BookFormData> = (formData: BookFormData) => {
+    setQueryParams(formData);
+    console.log({ formData });
   };
   return (
     <div>
@@ -90,7 +73,7 @@ const Books = () => {
               </div>
               <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
                 <select
-                  {...register("publishedDate")}
+                  {...register("publishedYearFilter")}
                   className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
                 >
                   <option value="">All Years</option>
@@ -116,7 +99,7 @@ const Books = () => {
             </div>
           </form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {allBooks.map((book) => (
+            {booksData?.data?.map((book: IBook) => (
               <BookCard key={book?._id} book={book} />
             ))}
           </div>

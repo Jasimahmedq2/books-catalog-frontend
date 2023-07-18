@@ -6,3 +6,12 @@ export interface IBook {
   publishedDate: string;
   title: string;
 }
+
+export interface ILoginUser {
+  userId: string | null;
+  email: string | null;
+  name?: {
+    firstName?: string;
+    lastName?: string;
+  };
+}
