@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-misused-promises */
@@ -12,12 +13,16 @@ import {
   useGetSingleBookQuery,
 } from "../redux/features/books/bookApi";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { IBook } from "../interfaces/books/bookInterface";
+import { useState } from "react";
+import DeleteBook from "../components/deleteModal";
 
 interface IReviews {
   review: string;
 }
 
 const BooksDetails = () => {
+  const [deleteBook, setDeleteBook] = useState<string | null>(null);
   const { bookId } = useParams();
   const {
     register,
@@ -43,7 +48,7 @@ const BooksDetails = () => {
     return <p>loading...</p>;
   }
 
-  const { image, author, publishedDate, title, reviews } = bookData?.data;
+  const { _id, image, author, publishedDate, title, reviews } = bookData?.data;
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
@@ -71,9 +76,13 @@ const BooksDetails = () => {
                 >
                   edit book
                 </Link>
-                <button className="ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                <label
+                  htmlFor="delete-post-modal"
+                  onClick={() => setDeleteBook(bookData?.data)}
+                  className="ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+                >
                   delete book
-                </button>
+                </label>
               </div>
             </div>
           </div>
@@ -128,6 +137,9 @@ const BooksDetails = () => {
           </div>
         </div>
       </div>
+      {deleteBook && (
+        <DeleteBook deleteBook={deleteBook} setDeleteBook={setDeleteBook} />
+      )}
     </div>
   );
 };
