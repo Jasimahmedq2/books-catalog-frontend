@@ -22,7 +22,7 @@ interface IReviews {
 }
 
 const BooksDetails = () => {
-  const [deleteBook, setDeleteBook] = useState<string | null>(null);
+  const [deleteBook, setDeleteBook] = useState<IBook | null>(null);
   const { bookId } = useParams();
   const {
     register,

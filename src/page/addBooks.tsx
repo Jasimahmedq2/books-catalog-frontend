@@ -1,6 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { useForm, SubmitHandler } from "react-hook-form";
+import { IBook } from "../interfaces/books/bookInterface";
+import { useCreateUserMutation } from "../redux/features/books/bookApi";
+import { toast } from "react-toastify";
 
 interface BookFormData {
   image: string;
@@ -15,10 +22,36 @@ const AddBookPage = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<BookFormData>();
-  const onSubmit: SubmitHandler<BookFormData> = (data) => {
-    console.log(data);
+
+  const [createUser, { isSuccess }] = useCreateUserMutation();
+
+  const onSubmit: SubmitHandler<IBook> = (data) => {
+    const privateUrl = "44c26384eae4023f6064cf342eee9294";
+    const formData = new FormData();
+    formData.append("image", data?.image[0]);
+
+    fetch(`https://api.imgbb.com/1/upload?key=${privateUrl}`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const bookOptions = {
+          image: result?.data?.url,
+          author: data.author,
+          publishedDate: data.publishedDate,
+          title: data.title,
+          genre: data.genre,
+        };
+        createUser(bookOptions);
+        if (isSuccess) {
+          toast.success("successfully crated a book");
+        }
+      });
+    reset();
   };
 
   return (

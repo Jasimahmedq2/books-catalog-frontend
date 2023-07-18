@@ -60,6 +60,18 @@ const bookApi = api.injectEndpoints({
       }),
       invalidatesTags: ["books"],
     }),
+    createUser: builder.mutation({
+      query: (data) => ({
+        url: `/books/create-book`,
+        method: "POST",
+        body: data,
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      invalidatesTags: ["books"],
+    }),
   }),
 });
 
@@ -70,4 +82,5 @@ export const {
   useAddReviewMutation,
   useEditBookMutation,
   useBookDeleteMutation,
+  useCreateUserMutation,
 } = bookApi;
