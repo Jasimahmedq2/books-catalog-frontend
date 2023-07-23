@@ -30,7 +30,9 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <h3 className="text-xl font-semibold mb-2">
+          {title.length > 15 ? title.slice(0, 15) + "..." : title}
+        </h3>
         <p className="text-gray-600 mb-2">Author: {author}</p>
         <p className="text-gray-600">
           PublishedDate: {publishedDate.slice(0, 4)}

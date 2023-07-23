@@ -7,9 +7,8 @@ import { api } from "../../api/apiSlice";
 const bookApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getPageBooks: builder.query({
-      query: (params) => ({
-        url: "/books/get-books",
-        params: params,
+      query: (data) => ({
+        url: `/books/get-books?searchQuery=${data.searchQuery}&genreFilter=${data.genreFilter}&publishedYearFilter=${data.publishedYearFilter}`,
       }),
       providesTags: ["books"],
     }),
@@ -72,6 +71,59 @@ const bookApi = api.injectEndpoints({
       }),
       invalidatesTags: ["books"],
     }),
+    addWishList: builder.mutation({
+      query: (data) => ({
+        url: `/users/wishlist/${data?.bookId}`,
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      invalidatesTags: ["books"],
+    }),
+    addRedingList: builder.mutation({
+      query: (data) => ({
+        url: `/users/readingList/${data?.bookId}`,
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      invalidatesTags: ["books"],
+    }),
+    getWishlist: builder.query({
+      query: () => ({
+        url: `/users/get-wishlist`,
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      providesTags: ["books"],
+    }),
+    getReadingList: builder.query({
+      query: () => ({
+        url: `/users/get-readingList`,
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      providesTags: ["books"],
+    }),
+    updateReadStatus: builder.mutation({
+      query: (data) => ({
+        url: `/users/update-readingStatus/${data.bookId}`,
+        body: { readStatus: data.readStatus },
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          authorization: `${localStorage.getItem("token")}`,
+        },
+      }),
+      invalidatesTags: ["books"],
+    }),
   }),
 });
 
@@ -83,4 +135,9 @@ export const {
   useEditBookMutation,
   useBookDeleteMutation,
   useCreateUserMutation,
+  useAddRedingListMutation,
+  useGetReadingListQuery,
+  useUpdateReadStatusMutation,
+  useGetWishlistQuery,
+  useAddWishListMutation,
 } = bookApi;

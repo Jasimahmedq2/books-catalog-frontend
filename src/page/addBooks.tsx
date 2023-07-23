@@ -28,7 +28,7 @@ const AddBookPage = () => {
 
   const [createUser, { isSuccess }] = useCreateUserMutation();
 
-  const onSubmit: SubmitHandler<IBook> = (data) => {
+  const onSubmit: SubmitHandler<BookFormData> = (data) => {
     const privateUrl = "44c26384eae4023f6064cf342eee9294";
     const formData = new FormData();
     formData.append("image", data?.image[0]);

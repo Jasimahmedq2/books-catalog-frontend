@@ -1,10 +1,19 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useParams } from "react-router-dom";
-import { useEditBookMutation } from "../redux/features/books/bookApi";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useEditBookMutation,
+  useGetSingleBookQuery,
+} from "../redux/features/books/bookApi";
+import { useEffect } from "react";
 
 interface BookFormData {
   title: string;
@@ -15,15 +24,24 @@ interface BookFormData {
 
 const EditPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
+  const navigate = useNavigate();
+
   const { bookId } = useParams();
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<BookFormData>();
 
-  const [editBook] = useEditBookMutation();
+  const [editBook, { isSuccess: editSuccess }] = useEditBookMutation();
+  const { data: bookData, isLoading } = useGetSingleBookQuery(bookId);
+
+  if (isLoading) {
+    return <p>Loading</p>;
+  }
   const onSubmit: SubmitHandler<BookFormData> = (data) => {
     const editOptions = {
       updatedData: {
@@ -34,9 +52,27 @@ const EditPage = () => {
       },
       bookId,
     };
+    console.log(editOptions);
     editBook(editOptions);
+
+    navigate(`/book/${bookId}`);
+
     reset();
   };
+
+  const currentBook = {
+    title: bookData?.data?.title,
+    author: bookData?.data?.author,
+    publishedDate: bookData?.data?.publishedDate,
+    genre: bookData?.data?.genre,
+  };
+
+  useEffect(() => {
+    setValue("title", currentBook.title);
+    setValue("author", currentBook.author);
+    setValue("publishedDate", currentBook.publishedDate);
+    setValue("genre", currentBook.genre);
+  }, [currentBook, setValue]);
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">

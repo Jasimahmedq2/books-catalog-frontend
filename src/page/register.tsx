@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-floating-promises */
@@ -9,10 +10,11 @@ import login from "../assets/image/login.svg.svg";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 import { useAppDispatch } from "../redux/hooks";
 import { useRegisterUserMutation } from "../redux/features/user/authApiSlice";
+import "react-toastify/dist/ReactToastify.css";
 
 interface IFormInputs {
   firstName: string;
@@ -34,6 +36,18 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("You successfully logged in");
+      console.log(data.data);
+      navigate("/");
+    }
+    if (isError) {
+      toast.error(`${error?.data?.message}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
+
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     console.log("data here:", data);
 
@@ -47,6 +61,10 @@ const Register = () => {
         password: data.password,
       };
       registerUser(registerOptions);
+      reset();
+    }
+    if (!isLoading && isSuccess) {
+      navigate("/login");
     }
   };
 
@@ -182,6 +200,7 @@ const Register = () => {
           />
         </motion.div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
